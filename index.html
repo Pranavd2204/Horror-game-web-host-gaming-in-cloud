@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Nightfall Arcade – Horror Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #222 0, #000 55%);
+      color: #eee;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER / NAVBAR */
+    header {
+      background: rgba(0, 0, 0, 0.9);
+      border-bottom: 1px solid #333;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #888);
+      box-shadow: 0 0 12px 3px #f00;
+      position: relative;
+    }
+
+    .logo-icon::before,
+    .logo-icon::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #000;
+    }
+
+    .logo-icon::before {
+      left: 8px;
+    }
+    .logo-icon::after {
+      right: 8px;
+    }
+
+    .logo-text {
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #f5f5f5;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      font-size: 0.95rem;
+    }
+
+    nav a {
+      color: #ccc;
+      text-decoration: none;
+      position: relative;
+      padding-bottom: 3px;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #f00, #f80);
+      transition: width 0.2s ease-out;
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    .btn-primary {
+      border: none;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f00, #f80);
+      color: #fff;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: transform 0.1s ease-out, box-shadow 0.15s ease-out;
+      box-shadow: 0 0 12px rgba(255, 0, 0, 0.7);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 18px rgba(255, 80, 0, 0.9);
+    }
+
+    /* LAYOUT */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+      gap: 1.5rem;
+      padding: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* HERO SECTION */
+    .hero {
+      position: relative;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 16px;
+      background: radial-gradient(circle at top, #330000 0, #050505 55%);
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background-image:
+        radial-gradient(circle at 20% 0%, rgba(255, 0, 0, 0.1), transparent 55%),
+        radial-gradient(circle at 80% 100%, rgba(255, 128, 0, 0.12), transparent 55%);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(260px, 1fr);
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .hero-tag {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #ffb199;
+      margin-bottom: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .hero-tag-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f00;
+      box-shadow: 0 0 10px #f00;
+      animation: pulse 1.4s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from {
+        transform: scale(0.9);
+        opacity: 0.6;
+      }
+      to {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+    }
+
+    .hero-title {
+      font-size: clamp(2rem, 3vw, 2.6rem);
+      line-height: 1.1;
+      margin-bottom: 0.7rem;
+    }
+
+    .hero-title span {
+      background: linear-gradient(90deg, #ff4b1f, #ff9068);
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      color: #ccc;
+      font-size: 0.95rem;
+      max-width: 34rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .btn-ghost {
+      border-radius: 999px;
+      padding: 0.38rem 0.85rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: transparent;
+      color: #eee;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .btn-ghost span {
+      display: inline-block;
+      transform: translateY(1px);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+
+    .hero-meta strong {
+      color: #fdd;
+      font-weight: 600;
+    }
+
+    /* CHARACTER STRIP */
+    .character-strip {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1.4rem;
+      flex-wrap: wrap;
+    }
+
+    .character-card {
+      flex: 1 1 120px;
+      min-width: 110px;
+      max-width: 140px;
+      background: rgba(15, 15, 15, 0.9);
+      border-radius: 12px;
+      padding: 0.6rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, border-color 0.15s ease-out;
+    }
+
+    .character-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 80, 0, 0.7);
+      box-shadow: 0 0 18px rgba(255, 80, 0, 0.4);
+    }
+
+    .character-avatar {
+      width: 100%;
+      height: 70px;
+      border-radius: 10px;
+      background: radial-gradient(circle at 30% 20%, #fff, #ccc);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .character-avatar::before,
+    .character-avatar::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #000;
+      top: 26px;
+    }
+
+    .character-avatar::before {
+      left: 30%;
+    }
+    .character-avatar::after {
+      right: 30%;
+    }
+
+    .character-name {
+      margin-top: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .character-role {
+      font-size: 0.7rem;
+      color: #aaa;
+    }
+
+    .character-tag {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(255, 0, 0, 0.35);
+      color: #ffd9d9;
+      padding: 2px 6px;
+      border-radius: 999px;
+    }
+
+    /* GAME PANEL */
+    .game-panel {
+      background: radial-gradient(circle at top, #111 0, #050505 55%);
+      border-radius: 16px;
+      padding: 1rem 1.1rem 1.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #ffb199;
+    }
+
+    .panel-subtitle {
+      font-size: 0.8rem;
+      color: #bbb;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .stat-pill {
+      flex: 1;
+      padding: 0.3rem 0.4rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #eee;
+    }
+
+    .stat-pill span {
+      font-weight: 600;
+      color: #ffd2c2;
+    }
+
+    .game-area {
+      margin-top: 0.3rem;
+      position: relative;
+      border-radius: 12px;
+      background: radial-gradient(circle at 20% 20%, #222, #050505 60%);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      height: 260px;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    .game-overlay-text {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-size: 0.9rem;
+      color: #ddd;
+      pointer-events: none;
+    }
+
+    .ghost {
+      position: absolute;
+      width: 60px;
+      height: 70px;
+      border-radius: 40px 40px 24px 24px;
+      background: radial-gradient(circle at 30% 20%, #fff, #bbb);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
+      overflow: hidden;
+      transition: transform 0.05s linear;
+    }
+
+    .ghost-eyes::before,
+    .ghost-eyes::after {
+      content: "";
+      position: absolute;
+      top: 22px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #000;
+    }
+
+    .ghost-eyes::before {
+      left: 16px;
+    }
+    .ghost-eyes::after {
+      right: 16px;
+    }
+
+    .ghost-mouth {
+      position: absolute;
+      left: 50%;
+      top: 38px;
+      transform: translateX(-50%);
+      width: 18px;
+      height: 12px;
+      border-radius: 0 0 18px 18px;
+      background: #000;
+    }
+
+    .ghost-tail {
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      right: 0;
+      height: 14px;
+      background: repeating-linear-gradient(
+        -45deg,
+        #bbb 0,
+        #bbb 6px,
+        #fff 6px,
+        #fff 12px
+      );
+    }
+
+    .game-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.7rem;
+      margin-top: 0.4rem;
+      font-size: 0.78rem;
+      color: #aaa;
+    }
+
+    .control-tips {
+      max-width: 60%;
+    }
+
+    @media (max-width: 900px) {
+      .control-tips {
+        max-width: 100%;
+      }
+    }
+
+    .difficulty-select {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .difficulty-select select {
+      background: #111;
+      color: #eee;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.15rem 0.4rem;
+      font-size: 0.78rem;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 0.9rem 1.5rem;
+      font-size: 0.78rem;
+      color: #777;
+      background: #050505;
+      border-top: 1px solid #111;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 0.9rem;
+    }
+
+    .footer-links a {
+      color: #777;
+      text-decoration: none;
+      font-size: 0.78rem;
+    }
+
+    .footer-links a:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <div class="logo-icon"></div>
+      <div class="logo-text">Nightfall Arcade</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#games">Games</a></li>
+        <li><a href="#characters">Characters</a></li>
+        <li><a href="#news">News</a></li>
+      </ul>
+    </nav>
+    <button class="btn-primary" id="playNowBtn">Play Now</button>
+  </header>
+
+  <main>
+    <!-- LEFT: HERO + CHARACTERS -->
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <div class="hero-tag">
+            <span class="hero-tag-dot"></span>
+            Live Event · Haunted Season
+          </div>
+          <h1 class="hero-title">
+            Enter the <span>House of Echoes</span>
+          </h1>
+          <p class="hero-subtitle">
+            A multiplayer horror arena where four hunters try to cleanse a cursed mansion while a single ghost bends the shadows against them.
+          </p>
+          <div class="hero-cta">
+            <button class="btn-primary" id="startGameTop">Start Ghost Hunt</button>
+            <button class="btn-ghost">
+              <span>▶</span>
+              Watch Trailer
+            </button>
+          </div>
+          <div class="hero-meta">
+            <div><strong>Mode:</strong> 4 Hunters vs 1 Ghost</div>
+            <div><strong>Map:</strong> Ravenwood Manor</div>
+            <div><strong>Status:</strong> Pre‑alpha web demo</div>
+          </div>
+
+          <div class="character-strip" id="characters">
+            <article class="character-card" data-char="warden">
+              <div class="character-avatar"></div>
+              <div class="character-tag">Tank</div>
+              <h3 class="character-name">Grave Warden</h3>
+              <p class="character-role">Soaks damage, protects gates.</p>
+            </article>
+            <article class="character-card" data-char="seer">
+              <div class="character-avatar"></div>
+              <div class="character-tag">Support</div>
+              <h3 class="character-name">Moonlit Seer</h3>
+              <p class="character-role">Reveals ghost trails.</p>
+            </article>
+            <article class="character-card" data-char="engineer">
+              <div class="character-avatar"></div>
+              <div class="character-tag">Control</div>
+              <h3 class="character-name">Rift Engineer</h3>
+              <p class="character-role">Deploys traps & wards.</p>
+            </article>
+            <article class="character-card" data-char="wraith">
+              <div class="character-avatar"></div>
+              <div class="character-tag">Ghost</div>
+              <h3 class="character-name">Nameless Wraith</h3>
+              <p class="character-role">Stalks from the dark.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: MINI GAME PANEL -->
+    <aside class="game-panel" id="games">
+      <div>
+        <h2 class="panel-title">Mini Demo · Ghost Hunt</h2>
+        <p class="panel-subtitle">
+          Catch the ghost before the timer runs out. Each ghost you banish makes the next one faster.
+        </p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-pill">
+          Time
+          <span id="timeLabel">30s</span>
+        </div>
+        <div class="stat-pill">
+          Score
+          <span id="scoreLabel">0</span>
+        </div>
+        <div class="stat-pill">
+          Combo
+          <span id="comboLabel">x1</span>
+        </div>
+      </div>
+
+      <div class="game-area" id="gameArea">
+        <div class="game-overlay-text" id="gameOverlay">
+          Click or tap the ghost to start the hunt.<br />
+          Move fast, it will not wait.
+        </div>
+      </div>
+
+      <div class="game-controls">
+        <div class="control-tips">
+          Controls: Click / tap on the ghost to banish it.  
+          Tip: Maintain your combo by never missing a ghost.
+        </div>
+        <div class="difficulty-select">
+          Difficulty:
+          <select id="difficultySelect">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+          </select>
+          <button class="btn-primary" id="restartBtn" style="padding: 0.3rem 0.8rem;">Restart</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer id="news">
+    <span>© 2025 Nightfall Arcade · Horror Gaming Portal</span>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Support</a>
+      <a href="#">Discord</a>
+    </div>
+  </footer>
+
+  <script>
+    // DOM elements
+    const playNowBtn = document.getElementById("playNowBtn");
+    const startGameTop = document.getElementById("startGameTop");
+    const gameArea = document.getElementById("gameArea");
+    const gameOverlay = document.getElementById("gameOverlay");
+    const timeLabel = document.getElementById("timeLabel");
+    const scoreLabel = document.getElementById("scoreLabel");
+    const comboLabel = document.getElementById("comboLabel");
+    const difficultySelect = document.getElementById("difficultySelect");
+    const restartBtn = document.getElementById("restartBtn");
+
+    // Game state
+    let score = 0;
+    let combo = 1;
+    let timeLeft = 30;
+    let timerId = null;
+    let ghost = null;
+    let ghostSpeed = 900; // ms between moves
+    let gameRunning = false;
+
+    function getDifficultySettings() {
+      const value = difficultySelect.value;
+      if (value === "easy") {
+        return { duration: 30, baseSpeed: 950 };
+      } else if (value === "hard") {
+        return { duration: 20, baseSpeed: 700 };
+      }
+      return { duration: 25, baseSpeed: 850 }; // normal
+    }
+
+    function createGhost() {
+      const div = document.createElement("div");
+      div.className = "ghost";
+      const eyes = document.createElement("div");
+      eyes.className = "ghost-eyes";
+      const mouth = document.createElement("div");
+      mouth.className = "ghost-mouth";
+      const tail = document.createElement("div");
+      tail.className = "ghost-tail";
+      div.appendChild(eyes);
+      div.appendChild(mouth);
+      div.appendChild(tail);
+      return div;
+    }
+
+    function placeGhostRandomly() {
+      if (!ghost) return;
+      const areaRect = gameArea.getBoundingClientRect();
+      const ghostWidth = 60;
+      const ghostHeight = 70;
+
+      const maxX = areaRect.width - ghostWidth - 10;
+      const maxY = areaRect.height - ghostHeight - 10;
+      const x = Math.random() * maxX + 5;
+      const y = Math.random() * maxY + 5;
+
+      ghost.style.left = x + "px";
+      ghost.style.top = y + "px";
+    }
+
+    function scheduleGhostMove() {
+      if (!gameRunning) return;
+      placeGhostRandomly();
+      const speed = Math.max(350, ghostSpeed - score * 10);
+      setTimeout(scheduleGhostMove, speed);
+    }
+
+    function startTimer() {
+      const settings = getDifficultySettings();
+      timeLeft = settings.duration;
+      timeLabel.textContent = timeLeft + "s";
+
+      timerId = setInterval(() => {
+        timeLeft--;
+        timeLabel.textContent = timeLeft + "s";
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function updateHUD() {
+      scoreLabel.textContent = score;
+      comboLabel.textContent = "x" + combo;
+    }
+
+    function resetGameState() {
+      const settings = getDifficultySettings();
+      score = 0;
+      combo = 1;
+      ghostSpeed = settings.baseSpeed;
+      timeLeft = settings.duration;
+      updateHUD();
+      timeLabel.textContent = timeLeft + "s";
+      if (timerId) clearInterval(timerId);
+      if (ghost && ghost.parentNode === gameArea) {
+        gameArea.removeChild(ghost);
+      }
+      ghost = null;
+      gameRunning = false;
+      gameOverlay.style.display = "block";
+      gameOverlay.innerHTML = "Click or tap the ghost to start the hunt.<br />Move fast, it will not wait.";
+    }
+
+    function startGame() {
+      if (gameRunning) return;
+      resetGameState();
+      gameRunning = true;
+      gameOverlay.style.display = "none";
+
+      ghost = createGhost();
+      gameArea.appendChild(ghost);
+      placeGhostRandomly();
+      scheduleGhostMove();
+      startTimer();
+    }
+
+    function endGame() {
+      if (!gameRunning) return;
+      gameRunning = false;
+      if (timerId) clearInterval(timerId);
+      gameOverlay.style.display = "block";
+      gameOverlay.innerHTML =
+        "Hunt over.<br>Final score: <strong>" + score + "</strong> · Best combo: <strong>x" + combo + "</strong><br>Press Restart to try a new run.";
+    }
+
+    // Events
+    playNowBtn.addEventListener("click", () => {
+      gameArea.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(startGame, 350);
+    });
+
+    startGameTop.addEventListener("click", () => {
+      gameArea.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(startGame, 350);
+    });
+
+    restartBtn.addEventListener("click", () => {
+      gameArea.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(startGame, 200);
+    });
+
+    difficultySelect.addEventListener("change", () => {
+      resetGameState();
+    });
+
+    gameArea.addEventListener("click", (e) => {
+      if (!gameRunning || !ghost) {
+        // If the game is not running, start it on click
+        startGame();
+        return;
+      }
+
+      if (e.target === ghost || ghost.contains(e.target)) {
+        // Hit
+        score += 10 * combo;
+        combo++;
+        updateHUD();
+        placeGhostRandomly();
+      } else {
+        // Miss
+        combo = 1;
+        updateHUD();
+      }
+    });
+
+    // Initialize
+    resetGameState();
+  </script>
+</body>
+</html>
